@@ -10,15 +10,34 @@
   <title>Le Royaume magique de Constance</title>
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/styles.css?v=3" />
+  <link rel="stylesheet" href="/styles.css?v=4" />
 </head>
 <body>
   <div id="app" class="app-shell"></div>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.min.js"></script>
-  <script src="/app.js?v=3" defer></script>
+  <script type="module">
+    async function bootGame() {
+      let THREE;
+      try {
+        THREE = await import('https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.min.js');
+      } catch (primaryError) {
+        console.warn('Three.js jsDelivr indisponible, essai du CDN de secours.', primaryError);
+        THREE = await import('https://unpkg.com/three@0.179.1/build/three.module.min.js');
+      }
+      window.THREE = THREE;
+      await import('/app.js?v=4');
+    }
+
+    bootGame().catch(error => {
+      console.error('Impossible de démarrer le Royaume magique.', error);
+      document.getElementById('app').innerHTML = `
+        <main style="min-height:100dvh;display:grid;place-items:center;padding:24px;background:#120925;color:white;font-family:system-ui;text-align:center">
+          <div><h1>La magie se prépare… ✨</h1><p>Recharge la page une fois pour lancer l’aventure.</p><button onclick="location.reload()" style="border:0;border-radius:18px;padding:16px 24px;background:#ffd66e;color:#35144d;font-weight:900;font-size:18px">Recharger</button></div>
+        </main>`;
+    });
+  </script>
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=3').catch(() => {}));
+      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=4').catch(() => {}));
     }
   </script>
 </body>
